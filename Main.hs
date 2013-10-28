@@ -14,7 +14,7 @@ parseExpr input = case Parse.parseExpr input of
 run :: String -> String 
 run source = either show show $ do 
   ast <- parseExpr source
-  Eval.eval Map.empty ast
+  (Eval.eval Map.empty ast)()
 
 main = forever $ do 
   putStr ">> "

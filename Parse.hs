@@ -20,7 +20,7 @@ parened = do
 
 ident = fmap Ident $ many1 alphaNum
 
-value = fmap (Value . VInt . read) $ many1 digit
+value = fmap (Value . read) $ many1 digit
 
 lambda = do
   string "\\"
