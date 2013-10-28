@@ -1,5 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-
 module AST where
 
 import Control.Monad.Error

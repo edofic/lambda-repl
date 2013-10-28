@@ -17,5 +17,6 @@ run source = either show show $ do
   Eval.eval Map.empty ast
 
 main = forever $ do 
+  putStr ">> "
   source <- getLine
-  putStrLn $ run source
+  putStrLn $ run source 
