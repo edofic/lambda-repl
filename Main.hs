@@ -1,10 +1,12 @@
 module Main where
 
-import Control.Monad
-import qualified Parse as Parse
+import AST
 import qualified Eval as Eval
 import qualified Data.Map as Map
-import AST
+import qualified Parse as Parse
+import Control.Monad (forever)
+import System.Console.Haskeline
+
 
 parseExpr :: String -> LambdaMonad Expr
 parseExpr input = case Parse.parseExpr input of 
@@ -14,9 +16,12 @@ parseExpr input = case Parse.parseExpr input of
 run :: String -> String 
 run source = either show show $ do 
   ast <- parseExpr source
-  (Eval.eval Map.empty ast)()
+  Eval.eval Map.empty ast
 
-main = forever $ do 
-  putStr ">> "
-  source <- getLine
-  putStrLn $ run source 
+main :: IO ()
+main = runInputT defaultSettings loop where
+  loop = do
+    sourceM <- getInputLine ">> "
+    case sourceM of 
+      Just source -> outputStrLn (run source) >> loop
+      Nothing     -> return ()

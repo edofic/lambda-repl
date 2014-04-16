@@ -18,16 +18,10 @@ data LambdaError =
     ParsingError String
   | NotFound String 
   | TypeError String 
-  | StrErr String
+  | StrErr String deriving Show
 
 instance Error LambdaError where
   noMsg = StrErr "Error"
   strMsg s = StrErr s
-
-instance Show LambdaError where
-  show (ParsingError s) = "Parsing error: " ++ s
-  show (NotFound s) = "Not found: " ++ s
-  show (TypeError s) = "Type error: " ++ s
-  show (StrErr er) = "Error: " ++ er
 
 type LambdaMonad = Either LambdaError
