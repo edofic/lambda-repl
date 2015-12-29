@@ -3,8 +3,6 @@ module Parse where
 import AST
 import Text.ParserCombinators.Parsec
 
--- value, ident, lambda, application
-
 parseExpr :: String -> Either ParseError Expr
 parseExpr = parse expr "(unknown)"
 
@@ -18,9 +16,9 @@ parened = do
   string ")"
   return e
 
-ident = fmap Ident $ many1 alphaNum
+ident = Ident <$> many1 alphaNum
 
-value = fmap (Value . read) $ many1 digit
+value = Value . read <$> many1 digit
 
 lambda = do
   string "\\"

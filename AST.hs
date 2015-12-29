@@ -2,11 +2,10 @@ module AST where
 
 import Control.Monad.Error
 
-data Expr = 
-    Ident String 
-  | Value Int
-  | Lambda String Expr 
-  | Application Expr Expr
+data Expr = Ident String
+          | Value Int
+          | Lambda String Expr
+          | Application Expr Expr
 
 instance Show Expr where
   show (Ident ident) = ident
@@ -14,14 +13,13 @@ instance Show Expr where
   show (Lambda name expr) = "λ" ++ name ++ "." ++ show expr
   show (Application e1 e2) = "(" ++ show e1 ++ ") (" ++ show e2 ++ ")"
 
-data LambdaError = 
-    ParsingError String
-  | NotFound String 
-  | TypeError String 
-  | StrErr String deriving Show
+data LambdaError = ParsingError String
+                 | NotFound String
+                 | TypeError String
+                 | StrErr String deriving Show
 
 instance Error LambdaError where
   noMsg = StrErr "Error"
-  strMsg s = StrErr s
+  strMsg = StrErr
 
 type LambdaMonad = Either LambdaError
