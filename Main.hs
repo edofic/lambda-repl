@@ -1,7 +1,6 @@
 module Main where
 
 import AST
-import Control.Monad (forever)
 import System.Console.Haskeline
 import Types
 import qualified Data.Map as Map

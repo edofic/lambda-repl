@@ -23,6 +23,7 @@ library
                      , containers
                      , parsec
   default-language:    Haskell2010
+  ghc-options:         -Wall -fno-warn-unused-do-bind
 
 executable lambda-repl
   main-is: Main.hs
@@ -31,3 +32,4 @@ executable lambda-repl
                      , containers
                      , haskeline
   default-language:    Haskell2010
+  ghc-options:         -Wall -fno-warn-unused-do-bind
