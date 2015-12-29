@@ -2,7 +2,7 @@ module Eval where
 
 import AST
 import qualified Data.Map as Map
-import Control.Monad.Error
+import Control.Monad.Except
 
 type Scope = Map.Map String Value
 

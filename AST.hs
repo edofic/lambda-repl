@@ -1,7 +1,5 @@
 module AST where
 
-import Control.Monad.Error
-
 data Expr = Ident String
           | Value Int
           | Lambda String Expr
@@ -17,9 +15,5 @@ data LambdaError = ParsingError String
                  | NotFound String
                  | TypeError String
                  | StrErr String deriving Show
-
-instance Error LambdaError where
-  noMsg = StrErr "Error"
-  strMsg = StrErr
 
 type LambdaMonad = Either LambdaError
