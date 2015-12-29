@@ -23,6 +23,10 @@ eval :: Expr -> LambdaMonad Value
 eval (Value v) = return $ VInt v
 eval (Ident ident) = get >>= (maybeToEval ident . Map.lookup ident)
 eval (Lambda name expr ) = VFunc name expr <$> get
+eval (Let name expr) = do
+  v <- eval expr
+  modify $ Map.insert name v
+  return v
 eval (Application f arg) =
   let evalFuncVal x (VFunc name expr scope') = local (Map.insert name x scope') $ eval expr
       evalFuncVal x (VDelayed v)             = v >>=  evalFuncVal x

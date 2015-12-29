@@ -1,21 +1,31 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Main where
 
-import System.Console.Haskeline
+import Control.Monad.State
 import qualified Data.Map as Map
 import qualified Eval
-import Control.Monad.State
 import qualified Parse
+import qualified Types
+import System.Console.Haskeline
 
 
-run :: String -> String
-run source = either show show $ flip evalStateT Map.empty $ do
-  ast <- Parse.parseExpr source
-  Eval.eval ast
+run :: MonadState Types.Scope m => String -> m String
+run source = do
+  scope <- get
+  case runStateT (Parse.parseExpr source >>= Eval.eval) scope of
+    Left err    -> return (show err)
+    Right (v,s) -> put s >> return (show v)
+
+loop :: StateT Types.Scope (InputT IO) ()
+loop = do
+    sourceM <- lift $ getInputLine ">> "
+    case sourceM of
+      Nothing  -> return ()
+      Just src -> do
+        res <- run src
+        liftIO $ putStrLn res
+        loop
 
 main :: IO ()
-main = runInputT defaultSettings loop where
-  loop = do
-    sourceM <- getInputLine ">> "
-    case sourceM of
-      Just source -> outputStrLn (run source) >> loop
-      Nothing     -> return ()
+main = runInputT defaultSettings $ evalStateT loop Map.empty

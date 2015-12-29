@@ -17,7 +17,15 @@ parseExpr s = case parse expr "(unknown)" s of
   Right ast -> return ast
 
 expr :: P Expr
-expr = try application <|> nonApplication
+expr = assignment <|> try application <|> nonApplication
+
+assignment :: P Expr
+assignment = do
+  string "let "
+  name <- many1 alphaNum
+  string " = "
+  e <- expr
+  return $ Let name e
 
 nonApplication :: P Expr
 nonApplication = lambda <|> value <|> ident <|> parened
