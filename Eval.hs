@@ -1,8 +1,9 @@
 module Eval where
 
 import AST
-import qualified Data.Map as Map
 import Control.Monad.Except
+import Types
+import qualified Data.Map as Map
 
 type Scope = Map.Map String Value
 

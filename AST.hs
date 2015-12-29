@@ -10,10 +10,3 @@ instance Show Expr where
   show (Value v) = show v
   show (Lambda name expr) = "λ" ++ name ++ "." ++ show expr
   show (Application e1 e2) = "(" ++ show e1 ++ ") (" ++ show e2 ++ ")"
-
-data LambdaError = ParsingError String
-                 | NotFound String
-                 | TypeError String
-                 | StrErr String deriving Show
-
-type LambdaMonad = Either LambdaError
