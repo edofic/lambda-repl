@@ -1,22 +1,16 @@
 module Main where
 
-import AST
 import System.Console.Haskeline
-import Types
 import qualified Data.Map as Map
 import qualified Eval
+import Control.Monad.State
 import qualified Parse
 
 
-parseExpr :: String -> LambdaMonad Expr
-parseExpr input = case Parse.parseExpr input of
-  Left er -> Left $ ParsingError $ show er
-  Right ast -> Right ast
-
 run :: String -> String
-run source = either show show $ do
-  ast <- parseExpr source
-  Eval.eval Map.empty ast
+run source = either show show $ flip evalStateT Map.empty $ do
+  ast <- Parse.parseExpr source
+  Eval.eval ast
 
 main :: IO ()
 main = runInputT defaultSettings loop where

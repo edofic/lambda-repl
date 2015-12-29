@@ -31,5 +31,6 @@ executable lambda-repl
                      , lambda-repl
                      , containers
                      , haskeline
+                     , mtl
   default-language:    Haskell2010
   ghc-options:         -Wall -fno-warn-unused-do-bind

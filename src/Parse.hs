@@ -1,15 +1,20 @@
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Parse where
 
 import AST
+import Types
+import Control.Monad.Except
 import Text.Parsec (Parsec)
 import Text.ParserCombinators.Parsec
 
 type P a = forall u . Parsec String u a
 
-parseExpr :: String -> Either ParseError Expr
-parseExpr = parse expr "(unknown)"
+parseExpr :: MonadError LambdaError m => String -> m Expr
+parseExpr s = case parse expr "(unknown)" s of
+  Left er -> throwError $ ParsingError $ show er
+  Right ast -> return ast
 
 expr :: P Expr
 expr = try application <|> nonApplication
