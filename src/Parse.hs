@@ -12,7 +12,7 @@ import Text.ParserCombinators.Parsec
 type P a = forall u . Parsec String u a
 
 parseExpr :: MonadError LambdaError m => String -> m Expr
-parseExpr s = case parse expr "(unknown)" s of
+parseExpr s = case parse (expr <* eof) "(unknown)" s of
   Left er -> throwError $ ParsingError $ show er
   Right ast -> return ast
 

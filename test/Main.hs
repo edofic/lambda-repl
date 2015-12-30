@@ -64,9 +64,11 @@ main = hspec $ do
           comp = forM program (parseExpr >=> Eval.eval)
           res = evalStateT comp Map.empty
       res `shouldBe` Right [VInt 1, VInt 1]
-    it "does simple application" $ 
+    it "does simple application" $
       run "(\\x.x) 1" `shouldBe` Right (VDelayed $ Right $ VInt 1)
     it "does repeated application" $ do
       run "(\\x.x) (\\x.x) 1" `shouldBe` Right (VDelayed $ Right $ VInt 1)
       run "(\\f.\\x.f x) (\\x.x) 1" `shouldBe` Right (
         VDelayed $ Right $ VDelayed $ Right $ VInt 1)
+      run "(\\f.(\\x.f (x x)) (\\x.f (x x))) (\\f.1)" `shouldBe` Right (VInt 1)
+
