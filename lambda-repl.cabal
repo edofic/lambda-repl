@@ -25,6 +25,20 @@ library
   default-language:    Haskell2010
   ghc-options:         -Wall
 
+
+test-suite lambda-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Main.hs
+  build-depends:       base
+                     , lambda-repl
+                     , hspec
+                     , mtl
+                     , containers
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+
+
 executable lambda-repl
   main-is: Main.hs
   build-depends:       base

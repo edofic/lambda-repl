@@ -6,9 +6,13 @@ import AST
 
 type Scope = Map.Map String Value
 
+
+-- NOTE: function equality is code-wise
+--       equality on delayed *will* force
 data Value = VInt Int
            | VFunc String Expr Scope
            | VDelayed (Either LambdaError Value)
+           deriving Eq
 
 instance Show Value where
   show (VInt n) = show n
