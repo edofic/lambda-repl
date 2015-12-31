@@ -81,3 +81,11 @@ main = hspec $ do
    it "support equality" $ do
      runWith builtins "eq 0 0 1 2" `shouldBe` Right (VInt 1)
      runWith builtins "eq 0 3 1 2" `shouldBe` Right (VInt 2)
+
+  describe "Large scale" $ do
+    it "can do sum up to 10" $
+      let program = "Y (\\f.\\x.eq x 0 0 (plus x (f (plus x -1)))) 10"
+      in  runWith builtins program `shouldBe` Right (VInt 55)
+    it "can do naive fibonacci" $
+      let program = "Y (\\f.\\n.eq n 1 1 (eq n 2 1 (plus (f (plus n -1)) (f (plus n -2))))) 7"
+      in  runWith builtins program `shouldBe` Right (VInt 13)
