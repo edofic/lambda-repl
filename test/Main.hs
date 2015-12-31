@@ -1,6 +1,7 @@
 import Test.Hspec
 
 import AST
+import Builtin (builtins)
 import Control.Monad
 import Control.Monad.State
 import Parse (parseExpr)
@@ -56,7 +57,7 @@ main = hspec $ do
       let body  = Application (Ident "f") (Ident "x")
           fx    = Lambda "f" body
           fx'   = Application (Lambda "x" fx) (Value 1)
-          scope = Map.fromList [("x", VDelayed (Right $ VInt 1))]
+          scope = Map.fromList [("x", VInt 1)]
       eval fx `shouldBe` Right (VFunc "f" body Map.empty)
       eval fx' `shouldBe` Right (VFunc "f" body scope)
     it "allows assignment" $ do
@@ -65,10 +66,17 @@ main = hspec $ do
           res = evalStateT comp Map.empty
       res `shouldBe` Right [VInt 1, VInt 1]
     it "does simple application" $
-      run "(\\x.x) 1" `shouldBe` Right (VDelayed $ Right $ VInt 1)
+      run "(\\x.x) 1" `shouldBe` Right (VInt 1)
     it "does repeated application" $ do
-      run "(\\x.x) (\\x.x) 1" `shouldBe` Right (VDelayed $ Right $ VInt 1)
-      run "(\\f.\\x.f x) (\\x.x) 1" `shouldBe` Right (
-        VDelayed $ Right $ VDelayed $ Right $ VInt 1)
+      run "(\\x.x) (\\x.x) 1" `shouldBe` Right (VInt 1)
+      run "(\\f.\\x.f x) (\\x.x) 1" `shouldBe` Right (VInt 1)
       run "(\\f.(\\x.f (x x)) (\\x.f (x x))) (\\f.1)" `shouldBe` Right (VInt 1)
 
+  describe "Builtins" $ do
+   it "support plus" $
+     runWith "plus 1 2" builtins `shouldBe` Right (VInt 3)
+   it "support partial application" $
+     runWith "plus 1" builtins `shouldBe` Right (VNative "plus_1" undefined)
+   it "support equality" $ do
+     runWith "eq 0 0 1 2" builtins `shouldBe` Right (VInt 1)
+     runWith "eq 0 3 1 2" builtins `shouldBe` Right (VInt 2)

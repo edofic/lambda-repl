@@ -29,7 +29,8 @@ eval (Let name expr) = do
   return v
 eval (Application f arg) =
   let evalFuncVal x (VFunc name expr scope') = local (Map.insert name x scope') $ eval expr
-      evalFuncVal x (VDelayed v)             = lift v >>=  evalFuncVal x
+      evalFuncVal x (VDelayed v)             = lift v >>= evalFuncVal x
+      evalFuncVal x (VNative _ n)            = lift (n x)
       evalFuncVal _ othr                     =
         throwError $ TypeError $ show othr ++ " is not a function"
   in do

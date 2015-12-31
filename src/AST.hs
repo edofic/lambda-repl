@@ -5,6 +5,7 @@ data Expr = Ident String
           | Lambda String Expr
           | Application Expr Expr
           | Let String Expr
+          deriving Eq
 
 instance Show Expr where
   show (Ident ident) = ident
