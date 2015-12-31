@@ -16,13 +16,17 @@ parseExpr s = case parse (expr <* eof) "(unknown)" s of
   Left er -> throwError $ ParsingError $ show er
   Right ast -> return ast
 
+
 expr :: P Expr
-expr = assignment <|> try application <|> nonApplication
+expr = assignment <|> application
 
 assignment :: P Expr
 assignment = Let <$>
             (string "let " *> many1 alphaNum) <*>
             (string " = " *> expr)
+
+application :: P Expr
+application = foldl1 Application <$> sepBy1 nonApplication space
 
 nonApplication :: P Expr
 nonApplication = lambda <|> value <|> ident <|> parened
@@ -41,9 +45,3 @@ lambda = do
   Ident name <- string "\\" *> ident
   body <- string "." *> expr
   return $ Lambda name body
-
-application :: P Expr
-application = do
-  f <- nonApplication <* space
-  xs <- sepBy1 nonApplication space
-  return $ foldl Application f xs
