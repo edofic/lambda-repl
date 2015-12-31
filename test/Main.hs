@@ -13,10 +13,10 @@ eval :: Expr -> Either LambdaError Value
 eval expr = evalStateT (Eval.eval expr) Map.empty
 
 run :: String -> Either LambdaError Value
-run s = runWith s Map.empty
+run = runWith Map.empty
 
-runWith :: String -> Scope -> Either LambdaError Value
-runWith s = evalStateT (parseExpr s >>= Eval.eval)
+runWith :: Scope -> String -> Either LambdaError Value
+runWith str s = evalStateT (parseExpr s >>= Eval.eval) str
 
 main :: IO ()
 main = hspec $ do
@@ -51,7 +51,7 @@ main = hspec $ do
       eval (Value 1) `shouldBe` Right (VInt 1)
       run "1" `shouldBe` Right (VInt 1)
     it "looks up identifiers" $
-      runWith "foo" (Map.insert "foo" (VInt 3) Map.empty) `shouldBe`
+      runWith (Map.insert "foo" (VInt 3) Map.empty) "foo" `shouldBe`
         Right (VInt 3)
     it "wraps lambdas" $ do
       let body  = Application (Ident "f") (Ident "x")
@@ -74,9 +74,9 @@ main = hspec $ do
 
   describe "Builtins" $ do
    it "support plus" $
-     runWith "plus 1 2" builtins `shouldBe` Right (VInt 3)
+     runWith builtins "plus 1 2" `shouldBe` Right (VInt 3)
    it "support partial application" $
-     runWith "plus 1" builtins `shouldBe` Right (VNative "plus_1" undefined)
+     runWith builtins "plus 1" `shouldBe` Right (VNative "plus_1" undefined)
    it "support equality" $ do
-     runWith "eq 0 0 1 2" builtins `shouldBe` Right (VInt 1)
-     runWith "eq 0 3 1 2" builtins `shouldBe` Right (VInt 2)
+     runWith builtins "eq 0 0 1 2" `shouldBe` Right (VInt 1)
+     runWith builtins "eq 0 3 1 2" `shouldBe` Right (VInt 2)
