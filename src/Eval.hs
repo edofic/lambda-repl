@@ -6,36 +6,27 @@ import Types
 import qualified Data.Map as Map
 import Control.Monad.State
 
-
-maybeToEval :: String -> Maybe a -> LambdaMonad a
-maybeToEval _ (Just a) = return a
-maybeToEval name Nothing = throwError (NotFound name)
-
-local :: MonadState s m => s -> m a -> m a
-local s ma = do
-  original <- get
-  put s
-  res <- ma
-  put original
-  return res
-
 eval :: Expr -> LambdaMonad Value
 eval (Value v) = return $ VInt v
-eval (Ident ident) = get >>= (maybeToEval ident . Map.lookup ident)
+eval (Ident ident) = do
+  scope <- get
+  case Map.lookup ident scope of Just a  -> return a
+                                 Nothing -> throwError $ NotFound ident
 eval (Lambda name expr ) = VFunc name expr <$> get
 eval (Let name expr) = do
   v <- eval expr
   modify $ Map.insert name v
   return v
-eval (Application f arg) =
-  let evalFuncVal x (VFunc name expr scope') = local (Map.insert name x scope') $ eval expr
-      evalFuncVal x (VDelayed v)             = lift v >>= evalFuncVal x
-      evalFuncVal x (VNative _ n)            = lift (n x)
-      evalFuncVal _ othr                     =
-        throwError $ TypeError $ show othr ++ " is not a function"
-  in do
+eval (Application f arg) = do
     scope <- get
     f' <- eval f
     let x = VDelayed $ evalStateT (eval arg) scope
     evalFuncVal x f'
 
+evalFuncVal :: Value -> Value -> LambdaMonad Value
+evalFuncVal x (VFunc name expr scope') =
+  lift $ evalStateT (eval expr) (Map.insert name x scope')
+evalFuncVal x (VDelayed v)  = lift v >>= evalFuncVal x
+evalFuncVal x (VNative _ n) = lift (n x)
+evalFuncVal _ othr          =
+  throwError $ TypeError $ show othr ++ " is not a function"
