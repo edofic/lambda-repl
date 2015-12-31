@@ -22,17 +22,17 @@ expr = assignment <|> application
 
 assignment :: P Expr
 assignment = Let <$>
-            (string "let " *> many1 alphaNum) <*>
-            (string " = " *> expr)
+            (string "let" *> many1 space *> many1 alphaNum) <*>
+            (many space *> string "=" *> many space *> expr)
 
 application :: P Expr
-application = foldl1 Application <$> sepBy1 nonApplication space
+application = foldl1 Application <$> sepBy1 nonApplication (many space)
 
 nonApplication :: P Expr
 nonApplication = lambda <|> value <|> ident <|> parened
 
 parened :: P Expr
-parened = string "(" *> expr <* string ")"
+parened = string "(" *> many space *>  expr <* many space <* string ")"
 
 ident :: P Expr
 ident = Ident <$> many1 alphaNum
@@ -42,6 +42,6 @@ value = Value . read <$> ((++) <$> option "" (string "-") <*> many1 digit)
 
 lambda :: P Expr
 lambda = do
-  Ident name <- string "\\" *> ident
-  body <- string "." *> expr
+  Ident name <- string "\\" *> many space *> ident
+  body <- many space *> string "." *> many space *> expr
   return $ Lambda name body

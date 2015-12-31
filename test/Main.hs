@@ -32,8 +32,9 @@ main = hspec $ do
       parseExpr "\\f.\\x.f x" `shouldBe` Right (
         Lambda "f" $ Lambda "x" $
           Application (Ident "f") (Ident "x"))
-    it "parses simple application" $
+    it "parses simple application" $ do
       parseExpr "f x" `shouldBe` Right (Application (Ident "f") (Ident "x"))
+      parseExpr "f  x" `shouldBe` Right (Application (Ident "f") (Ident "x"))
     it "parses multiple application" $
       parseExpr "a b c (d e) f" `shouldBe` Right (
         Application
