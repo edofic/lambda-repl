@@ -10,7 +10,7 @@ type Scope = Map.Map String Value
 data Value = VInt Int
            | VFunc String Expr Scope
            | VNative String (Value -> Either LambdaError Value)
-           | VDelayed (Either LambdaError Value)
+           | VDelayed (Either LambdaError Value) -- thunks
 
 whnf :: Value -> Either LambdaError Value
 whnf (VDelayed e) = e >>= whnf
@@ -23,6 +23,7 @@ instance Eq Value where
   VFunc n1 e1 s1 == VFunc n2 e2 s2 = n1 == n2 && e1 == e2 && s1 == s2
   -- NOTE: builtin equality is name-wise
   VNative n1 _ == VNative n2 _ = n1 == n2
+  -- NOTE: delayed equality will force
   v1@(VDelayed _) == v2 = whnf v1 == whnf v2
   v1 == v2@(VDelayed _) = whnf v1 == whnf v2
   _ == _ = False
