@@ -23,8 +23,9 @@ main = hspec $ do
   describe "Parser" $ do
     it "parses identifiers" $
       parseExpr "foo" `shouldBe` Right (Ident "foo")
-    it "parses constants" $
+    it "parses constants" $ do
       parseExpr "1" `shouldBe` Right (Value 1)
+      parseExpr "-1" `shouldBe` Right (Value (-1))
     it "parses simple lambdas" $
       parseExpr "\\x.x" `shouldBe` Right (Lambda "x" $ Ident "x")
     it "parses nested lambdas" $

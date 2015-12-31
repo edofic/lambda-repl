@@ -34,7 +34,7 @@ ident :: P Expr
 ident = Ident <$> many1 alphaNum
 
 value :: P Expr
-value = Value . read <$> many1 digit
+value = Value . read <$> ((++) <$> option "" (string "-") <*> many1 digit)
 
 lambda :: P Expr
 lambda = do
